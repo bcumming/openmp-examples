@@ -7,9 +7,9 @@ int main(void){
     std::cout << "sum with " << num_threads << " threads" << std::endl;
 
     int sum=0;
+
     #pragma omp parallel
     {
-        #pragma omp critical
         sum += omp_get_thread_num()+1;
     }
 

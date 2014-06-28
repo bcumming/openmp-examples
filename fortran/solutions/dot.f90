@@ -24,9 +24,11 @@ enddo
 time = -omp_get_wtime();
 
 sum = 0.0d0
+!$omp parallel do reduction(+:sum)
 do i=1,n
     sum = sum + a(i) * b(i)
 end do
+!$omp end parallel do
 time = time + omp_get_wtime()
 
 expected = (N+1.0d0)*N/4.0d0;

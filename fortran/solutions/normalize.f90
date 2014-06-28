@@ -28,7 +28,8 @@ implicit none
     print *, 'parallel error : ', abs(norm(v,n) - 1.0d0)
 
     print *, 'threads    : ', max_threads
-    print *, 'serial     : ', time_serial, ' seconds,\tparallel   : ', time_parallel, ' seconds'
+    print *, 'serial     : ', time_serial
+    print *, 'parallel   : ', time_parallel
     print *, 'speedup    : ', time_serial/time_parallel
     print *, 'efficiency : ', (time_serial/time_parallel)/max_threads
 
@@ -44,9 +45,11 @@ real (kind=8) function norm(v, n)
 
     integer :: i
 
+    !$omp parallel do reduction(+:norm)
     do i=1,n
         norm = norm + v(i)*v(i)
     end do
+    !$omp end parallel do
 
     norm = sqrt(norm)
 end
@@ -59,9 +62,11 @@ subroutine initialize(v, n)
 
     integer :: i
 
+    !$omp parallel do
     do i=1,n
         v(i) = cos(1.0d0*i) * 10.
     end do
+    !$omp end parallel do
 end subroutine
 
 subroutine normalize_vector(v, n)
@@ -93,16 +98,26 @@ subroutine normalize_vector_omp(v, n)
     real(kind=8) :: norm = 0.0d0
 
     ! compute the norm of v
+    !$omp parallel
+
+    !$omp do reduction(+:norm)
     do i=1,n
         norm = norm + v(i)*v(i);
     end do
+    !$omp end do
 
+    !$omp single
     norm = sqrt(norm)
+    !$omp end single
 
     ! normalize v
+    !$omp do
     do i=1,n
         v(i) = v(i) / norm
     end do
+    !$omp end do
+
+    !$omp end parallel
 end
 
 end

@@ -8,7 +8,6 @@
 double norm(double *v, int n){
     double norm = 0.;
 
-    #pragma omp parallel for reduction(+:norm)
     for(int i=0; i<n; i++)
         norm += v[i]*v[i];
 
@@ -17,7 +16,6 @@ double norm(double *v, int n){
 
 // initialise v to values between -10 and 10
 void initialize(double *v, int n){
-    #pragma omp parallel for
     for(int i=0; i<n; i++)
         v[i] = cos(double(i)) * 10.;
 }
@@ -41,27 +39,17 @@ void normalize_vector_omp(double *v, int n)
     double norm = 0.;
 
     // compute the norm of v
-    #pragma omp parallel
-    {
-        double sum = 0.;
-
-        #pragma omp for
-        for(int i=0; i<n; i++)
-            sum += v[i]*v[i];
-        #pragma omp critical
-        norm += sum;
-    }
-
+    for(int i=0; i<n; i++)
+        norm += v[i]*v[i];
     norm = sqrt(norm);
 
     // normalize v
-    #pragma omp parallel for
     for(int i=0; i<n; i++)
         v[i] /= norm;
 }
 
 int main( void ){
-    const int N = 10000000;
+    const int N = 100000000;
     double *v = (double*)malloc(N*sizeof(double));
     bool validated = false;
 
@@ -83,8 +71,8 @@ int main( void ){
     std::cout << "parallel error : " << fabs(norm(v,N) - 1.) << std::endl;
 
     std::cout << max_threads     << " threads" << std::endl;
-    std::cout << "serial     : " << time_serial << std::endl;
-    std::cout << "parallel   : " << time_parallel << std::endl;
+    std::cout << "serial     : " << time_serial << " seconds\t"
+              << "parallel   : " << time_parallel <<  " seconds" << std::endl;
     std::cout << "speedup    : " << time_serial/time_parallel << std::endl;
     std::cout << "efficiency : " << (time_serial/time_parallel)/double(max_threads) << std::endl;
 

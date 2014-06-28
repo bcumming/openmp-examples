@@ -18,16 +18,18 @@ time = -omp_get_wtime()
 
 w = 1.0d0/num_steps
 
+!$omp parallel do reduction(+:sum) private(x) firstprivate(w)
 do i=1,num_steps
     x = (i-0.5d0)*w;
     sum = sum + 4.0d0/(1.0d0+x*x);
 enddo
+!$omp end parallel do
 time = time + omp_get_wtime()
 
 ! estimate pi
 pi = w*sum
 
-! calculate the relative error of our estimation
+! caluclate the relative error of our estimation
 pi_reference = 3.141592653589793238462643383279502884d0
 error = abs(pi-pi_reference)/pi_reference
 

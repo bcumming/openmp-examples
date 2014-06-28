@@ -5,8 +5,14 @@ do
     echo ========================================
     echo "          $threads threads"
     echo ========================================
+    if [ "$threads" != "1" ]
+    then
+        lim=$[ 2*$[$threads - 1] ]
+        cc_string="$cc_string,$lim"
+    fi
     cc_string=none
     export OMP_NUM_THREADS=$threads
+    echo aprun -cc="$cc_string" ./a.out
     aprun -cc="$cc_string" ./a.out
 done
 

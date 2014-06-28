@@ -74,6 +74,31 @@ void normalize_vector_ompV2(T *v, int n){
     }
 }
 
+template <typename T>
+void normalize_vector_ompV3(T *v, int n){
+    T sum_global = 0.;
+    #pragma omp parallel
+    {
+        T sum = 0.;
+
+        #pragma omp for
+        for(int i=0; i<n; i++){
+            sum += v[i]*v[i];
+        }
+
+        #pragma omp critical
+        {
+            sum_global += sum;
+        }
+
+        T nrm = sqrt(sum_global);
+
+        #pragma omp for
+        for(int i=0; i<n; i++)
+            v[i] /= nrm;
+    }
+}
+
 int main( void ){
     const int N = 40000000;
     double *v = (double*)malloc(N*sizeof(double));

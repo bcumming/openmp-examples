@@ -19,3 +19,8 @@
 *.exe
 *.out
 *.app
+
+# vim temporaries
+*.swp
+*.swo
+*.swn

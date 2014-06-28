@@ -14,12 +14,10 @@ allocate(a(N), b(N))
 num_threads = omp_get_max_threads()
 print *, 'dot of vectors with length ', N, ' with ', num_threads, ' threads'
 
-!$omp parallel do
 do i=1,N
     a(i) = 1.0d0/2.0d0
     b(i) = i
 enddo
-!$omp end parallel do
 
 time = -omp_get_wtime();
 
